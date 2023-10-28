@@ -1,13 +1,36 @@
 from flask import Flask, request, jsonify
 import requests
 import jwt
+import hashlib
 from web3 import Web3
 import os
+from pymongo import MongoClient
 
+#Flask and Vars
 app = Flask(__name__)
 ganache_url = os.environ.get('GANACHE_URL')
 account_priv_key = os.environ.get('ACCOUNT_PRIV_KEY')
 public_key = os.environ.get('PUBLIC_KEY')
+
+
+
+#For mongoDB 
+"""client = MongoClient("")
+db = client[""]
+wallet_collection = db[""] """
+
+"""Status Codes:
+    1xx: Informational
+    2xx: Success (Client request was successful)
+    3xx: Redirection (Clieant must take additional actions in order for their request to be completed)
+    4xx: Client Error (Error at client request)
+    5xx: Server Error (Error at the server side)
+    
+""" 
+#Generate JWT
+#Encode JWT
+#Use verify_jwt() to decode the token and see what the response looks like
+#Start looking into ganache 
 
 @app.route('/verify-jwt', methods=['POST'])
 def verify_jwt():
@@ -33,6 +56,7 @@ def send_transaction():
     amount_in_wei = data.get('amount_in_wei')
     gas = data.get('gas')
     gas_price = data.get('gas_price')
+    account_address = "ENTER ACCOUNT ADDRESS HERE"
 
     if not (to_address and amount_in_wei and gas and gas_price):
         return jsonify({"error": "Missing required parameters"}), 400
@@ -45,7 +69,7 @@ def send_transaction():
         'value': amount_in_wei,
         'gas': gas,
         'gasPrice': w3.toWei(gas_price, 'gwei'),
-        # 'nonce': w3.eth.getTransactionCount(account_address)
+        'nonce': w3.eth.getTransactionCount(account_address)
     }
 
     # ------ transaction logic just in case we needa use it -----------------
