@@ -4,15 +4,11 @@ import jwt
 import hashlib
 from web3 import Web3
 import os
-from pymongo import MongoClient
+import config
 
 #Flask and Vars
 app = Flask(__name__)
-os.environ['GANACHE_URL'] = 'HTTP://127.0.0.1:7545'  # Replace with your desired URL
-ganache_url = os.environ.get('GANACHE_URL')
-account_priv_key = os.environ.get('ACCOUNT_PRIV_KEY')
-public_key = os.environ.get('PUBLIC_KEY')
-
+ganache_url = config.GANACHE_URL
 
 
 #For mongoDB 
@@ -33,22 +29,22 @@ wallet_collection = db[""] """
 #Use verify_jwt() to decode the token and see what the response looks like
 #Start looking into ganache 
 
-@app.route('/verify-jwt', methods=['POST'])
-def verify_jwt():
-    data = request.json
-    jwt_token = data.get('jwt')
-    if not jwt_token:
-        return jsonify({"error": "Missing JWT token"}), 400
+# @app.route('/verify-jwt', methods=['POST'])
+# def verify_jwt():
+#     data = request.json
+#     jwt_token = data.get('jwt')
+#     if not jwt_token:
+#         return jsonify({"error": "Missing JWT token"}), 400
 
-    try:
-        data_payload = jwt.decode(jwt_token, public_key, algorithms=['RS256'])
-        return jsonify(data_payload), 200
-    except jwt.exceptions.InvalidTokenError as err:
-        print(repr(err))
-        return jsonify({"error": "Invalid token"}), 401
-    except Exception as err:
-        print(f"WARNING EXCEPTION CAUGHT: {repr(err)}")
-        return jsonify({"error": "Server error"}), 500
+#     try:
+#         data_payload = jwt.decode(jwt_token, public_key, algorithms=['RS256'])
+#         return jsonify(data_payload), 200
+#     except jwt.exceptions.InvalidTokenError as err:
+#         print(repr(err))
+#         return jsonify({"error": "Invalid token"}), 401
+#     except Exception as err:
+#         print(f"WARNING EXCEPTION CAUGHT: {repr(err)}")
+#         return jsonify({"error": "Server error"}), 500
 
 @app.route('/send-transaction', methods=['POST'])
 def send_transaction():
