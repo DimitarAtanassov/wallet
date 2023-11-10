@@ -65,8 +65,18 @@ def send_transaction():
     gas_price_in_wei = w3.to_wei(gas_price,'gwei') # Assuming gas_price will always be in gwei when retrieved from Front End
     
     # Valadating data
-    if not (to_address and amount_in_wei and gas and gas_price_in_wei):
-        return jsonify({"error": "Missing required parameters"}), 400
+    if(
+        not all([to_address,transaction_amount,gas,gas_price,from_address,sender_private_key]) or
+        not isinstance(to_address,str) or
+        not isinstance(transaction_amount, (int,float)) or
+        not isinstance(gas,int) or
+        not isinstance(gas_price,int) or 
+        not isinstance(from_address,str) or
+        not isinstance(sender_private_key,str)
+        # Wait for update on if there is a minium treshold price in order to use app
+        # not 0 <= transaction_amount <= Threshold?
+    ):
+        return jsonify({"error" : "Parameters are missing or invalid"}),400
     
     # Connecting to Ganache
     w3 = Web3(Web3.HTTPProvider(ganache_url))
