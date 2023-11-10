@@ -15,7 +15,7 @@ jwt_header = {
 }
 
 # Values to be used in Payload(Transaction)
-amount_eth = 10 
+amount_eth = 200 
 amount_wei = w3.to_wei(amount_eth,'ether')
 gas = 6721975
 gas_price_gwei = 20
