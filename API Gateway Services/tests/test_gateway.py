@@ -13,7 +13,7 @@ class apiGateWayTests(unittest.TestCase):
         response = self.app.post('/send-transaction', json={})
         self.assertEqual(response.status_code, 400)
         response_data = json.loads(response.data.decode('utf-8'))
-        self.assertEqual({}, {"error": "Missing required parameters"})
+        self.assertEqual({}, {"error": "Parameters are missing or invalid"})
     
     # Mimics a successful transaction
     def test_send_transaction_success(self):
@@ -29,3 +29,36 @@ class apiGateWayTests(unittest.TestCase):
         data = json.loads(response.data.decode('utf-8'))
         self.assertEqual(response.status_code, 200)
         self.assertIn("Transaction_Hash", data)
+
+
+    # Test for invalid parameter types for each parameter
+    def test_invalid_parameter_types(self):
+        # Base data with all valid parameters
+        valid_data = {
+            'to_address': '0xRecipientAddress',
+            'transaction_amount': 1,  # Assuming valid amount as an integer
+            'gas': 21000,
+            'gas_price': 1000000000,
+            'from_address': '0xSenderAddress',
+            'private_key': 'valid_private_key',
+        }
+
+        # Dictionary of invalid parameters for testing
+        invalid_params = {
+            'to_address': 123,                     # Invalid type for to_address
+            'transaction_amount': 'invalid',       # Invalid type for transaction_amount
+            'gas': "invalid",                      # Invalid type for gas
+            'gas_price': "invalid",                # Invalid type for gas_price
+            'from_address': 123,                   # Invalid type for from_address
+            'private_key': 123                     # Invalid type for private_key
+        }
+
+        for param, invalid_value in invalid_params.items():
+            # Create data with one invalid parameter
+            data = valid_data.copy()
+            data[param] = invalid_value
+
+            response = self.app.post('/send-transaction', json=data)
+            self.assertEqual(response.status_code, 400)
+            response_data = json.loads(response.data.decode('utf-8'))
+            self.assertEqual(response_data, {"error": "Parameters are missing or invalid"})
