@@ -79,19 +79,25 @@ def send_transaction():
         return jsonify({"error" : "Parameters are missing or invalid"}),400
     
     # Connecting to Ganache
-    w3 = Web3(Web3.HTTPProvider(ganache_url))
-
-    #Create transaction object that will be sent to Ganache
-    transaction = {
-        'to': to_address,
-        'value': amount_in_wei,
-        'gas': gas,
-        'gasPrice': gas_price_in_wei,
-        'nonce': w3.eth.getTransactionCount(from_address)
-    }
-    signed_transaction = w3.eth.account.sign_transaction(transaction, sender_private_key)
-    transaction_hash = w3.eth.send_raw_transaction(signed_transaction.rawTransaction)
- 
-    # Return the Transaction Hash after the transaction is complete
-    return jsonify({"Transaction_Hash" : transaction_hash.hex()}), 200
-
+    try:
+        w3 = Web3(Web3.HTTPProvider(ganache_url))
+    except request.exceptions.RequestException:
+        return jsonify({"error" : "Connection to Ganache failed"}),500
+    try:
+        #Create transaction object that will be sent to Ganache
+        transaction = {
+            'to': to_address,
+            'value': amount_in_wei,
+            'gas': gas,
+            'gasPrice': gas_price_in_wei,
+            'nonce': w3.eth.getTransactionCount(from_address)
+        }
+        signed_transaction = w3.eth.account.sign_transaction(transaction, sender_private_key)
+        transaction_hash = w3.eth.send_raw_transaction(signed_transaction.rawTransaction)
+    
+        # Return the Transaction Hash after the transaction is complete
+        return jsonify({"Transaction_Hash" : transaction_hash.hex()}), 200
+    except ValueError as e:
+        err_msg = str(e)
+        if "insufficient funds for gas * price + value" in err_msg:
+            return jsonify({"error" : "Insufficient funds for transaction"}), 400
