@@ -101,11 +101,14 @@ def send_transaction():
         signed_transaction = w3.eth.account.sign_transaction(transaction, sender_private_key)
         transaction_hash = w3.eth.send_raw_transaction(signed_transaction.rawTransaction)
         # Return the Transaction Hash after the transaction is complete
-        return jsonify({"Transaction_Hash": transaction_hash.hex()}), 200
+        return jsonify({"Transaction_Hash": transaction_hash.hex(),
+                        "Transaction_Status" : True
+                        }), 200
     except ValueError as e:
         err_msg = str(e)
         if "insufficient funds for gas * price + value" in err_msg:
-            return jsonify({"error": "Insufficient funds for transaction"}), 400
+            return jsonify({"error": "Insufficient funds for transaction",
+                            "Transaction_Status" : False}), 400
 
 # Run the Flask app
 if __name__ == "__main__":
