@@ -102,7 +102,7 @@ def send_transaction():
         transaction_hash = w3.eth.send_raw_transaction(signed_transaction.rawTransaction)
         # Return the Transaction Hash after the transaction is complete
         return jsonify({"Transaction_Hash": transaction_hash.hex(),
-                        "Transaction_Status" : False
+                        "Transaction_Status" : True
                         }), 200
     except ValueError as e:
         err_msg = str(e)
